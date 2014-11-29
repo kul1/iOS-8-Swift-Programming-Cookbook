@@ -10,7 +10,7 @@
 //  Vandad Nahavandipoor for his work. Feel free to visit my blog
 //  at http://vandadnp.wordpress.com for daily tips and tricks in Swift
 //  and Objective-C and various other programming languages.
-//  
+//
 //  You can purchase "iOS 8 Swift Programming Cookbook" from
 //  the following URL:
 //  http://shop.oreilly.com/product/0636920034254.do
@@ -25,143 +25,152 @@ import UIKit
 import Photos
 
 class ViewController: UIViewController {
-  
-  /* Just a little method to help us display alert dialogs to the user */
-  func displayAlertWithTitle(title: String, message: String){
-    let controller = UIAlertController(title: title,
-      message: message,
-      preferredStyle: .Alert)
     
-    controller.addAction(UIAlertAction(title: "OK",
-      style: .Default,
-      handler: nil))
+    /* Just a little method to help us display alert dialogs to the user */
+    /* But once it's get ok from the device, the message will never shown up again !*/
     
-    presentViewController(controller, animated: true, completion: nil)
-    
-  }
-  
-  override func viewDidAppear(animated: Bool) {
-    
-    super.viewDidAppear(animated)
-    
-    PHPhotoLibrary.requestAuthorization{
-      [weak self](status: PHAuthorizationStatus) in
-      
-      dispatch_async(dispatch_get_main_queue(), {
+    func displayAlertWithTitle(title: String, message: String){
+        let controller = UIAlertController(title: title,
+            message: message,
+            preferredStyle: .Alert)
         
-        switch status{
-        case .Authorized:
-          self!.retrieveImage()
-        default:
-          self!.displayAlertWithTitle("Access",
-            message: "I could not access the photo library")
+        controller.addAction(UIAlertAction(title: "OK",
+            style: .Default,
+            handler: nil))
+        
+        presentViewController(controller, animated: true, completion: nil)
+        
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        
+        super.viewDidAppear(animated)
+        
+        PHPhotoLibrary.requestAuthorization{
+            [weak self](status: PHAuthorizationStatus) in
+            
+            dispatch_async(dispatch_get_main_queue(), {
+                
+                switch status{
+                case .Authorized:
+                    self!.retrieveImage()
+                default:
+                    self!.displayAlertWithTitle("Access",
+                        message: "I could not access the photo library")
+                }
+            })
+            
         }
-        })
-      
+        
     }
     
-  }
-  
-  func retrieveImage() {
-    super.viewDidLoad()
-    
-    /* Retrieve the items in order of modification date, ascending */
-    let options = PHFetchOptions()
-    options.sortDescriptors = [NSSortDescriptor(key: "modificationDate",
-      ascending: true)]
-    
-    /* Then get an object of type PHFetchResult that will contain
-    all our image assets */
-    let assetResults = PHAsset.fetchAssetsWithMediaType(.Image,
-      options: options)
-    
-    if assetResults == nil{
-      println("Found no results")
-      return
-    } else {
-      println("Found \(assetResults.count) results")
-    }
-    
-    let imageManager = PHCachingImageManager()
-    
-    assetResults.enumerateObjectsUsingBlock{(object: AnyObject!,
-      count: Int,
-      stop: UnsafeMutablePointer<ObjCBool>) in
-      
-      if object is PHAsset{
-        let asset = object as PHAsset
+    func retrieveImage() {
+        super.viewDidLoad()
         
-        let imageSize = CGSize(width: asset.pixelWidth,
-          height: asset.pixelHeight)
+        /* Retrieve the items in order of modification date, ascending */
+        let options = PHFetchOptions()
+        options.sortDescriptors = [NSSortDescriptor(key: "modificationDate",
+            ascending: true)]
         
-        /* For faster performance, and maybe degraded image */
-        let options = PHImageRequestOptions()
-        options.deliveryMode = .FastFormat
+        /* Then get an object of type PHFetchResult that will contain
+        all our image assets */
+        let assetResults = PHAsset.fetchAssetsWithMediaType(.Image,
+            options: options)
         
-        imageManager.requestImageForAsset(asset,
-          targetSize: imageSize,
-          contentMode: .AspectFill,
-          options: options,
-          resultHandler: {(image: UIImage!,
-            info: [NSObject : AnyObject]!) in
+        if assetResults == nil{
+            println("Found no results")
+            return
+        } else {
+            println("Found \(assetResults.count) results")
+        }
+        
+        let imageManager = PHCachingImageManager()
+        
+        assetResults.enumerateObjectsUsingBlock{(object: AnyObject!,
+            count: Int,
+            stop: UnsafeMutablePointer<ObjCBool>) in
             
-            /* The image is now available to us */
+            if object is PHAsset{
+                let asset = object as PHAsset
+                println("Inside If object is PHAsset number 1")
+                
+                let imageSize = CGSize(width: asset.pixelWidth,
+                    height: asset.pixelHeight)
+                
+                /* For faster performance, and maybe degraded image */
+                let options = PHImageRequestOptions()
+                options.deliveryMode = .FastFormat
+                
+                imageManager.requestImageForAsset(asset,
+                    targetSize: imageSize,
+                    contentMode: .AspectFill,
+                    options: options,
+                    resultHandler: {(image: UIImage!,
+                        info: [NSObject : AnyObject]!) in
+                        
+                        /* The image is now available to us */
+                        
+                        println("Inside If object is PHAssetThe image 2 and under is now available to us")
+                        
+                        
+                })
+                
+                println("Inside If object is PHAsset number 3")
+            }
+            println("Outside If object is PHAsset")
             
-          })
-      }
-      
+        }
+        
     }
     
-  }
-  
 }
 
-/* 2 */
+// 2
 //import UIKit
 //import Photos
 //import AVFoundation
 //
 //class ViewController: UIViewController {
-//  
+//
 //  var player: AVPlayer!
-//  
+//
 //  /* Just a little method to help us display alert dialogs to the user */
 //  func displayAlertWithTitle(title: String, message: String){
 //    let controller = UIAlertController(title: title,
 //      message: message,
 //      preferredStyle: .Alert)
-//    
+//
 //    controller.addAction(UIAlertAction(title: "OK",
 //      style: .Default,
 //      handler: nil))
-//    
+//
 //    presentViewController(controller, animated: true, completion: nil)
-//    
+//
 //  }
-//  
+//
 //  func retrieveAndPlayVideo(){
 //    /* Retrieve the items in order of modification date, ascending */
 //    let options = PHFetchOptions()
 //    options.sortDescriptors = [NSSortDescriptor(key: "modificationDate",
 //      ascending: true)]
-//    
+//
 //    /* Then get an object of type PHFetchResult that will contain
 //    all our video assets */
 //    let assetResults = PHAsset.fetchAssetsWithMediaType(.Video,
 //      options: options)
-//    
+//
 //    if assetResults == nil{
 //      println("Found no results")
 //      return
 //    } else {
 //      println("Found \(assetResults.count) results")
 //    }
-//    
+//
 //    /* Get the first video */
 //    let object: AnyObject = assetResults[0]
-//    
+//
 //    if let asset = object as? PHAsset{
-//      
+//
 //      /* We want to be able to display a video even if it currently
 //      resides only on the cloud and not on the device */
 //      let options = PHVideoRequestOptions()
@@ -172,25 +181,25 @@ class ViewController: UIViewController {
 //        error: NSError!,
 //        stop: UnsafeMutablePointer<ObjCBool>,
 //        info: [NSObject : AnyObject]!) in
-//        
+//
 //        /* You can write your code here that shows a progress bar to the
 //        user and then using the progress parameter of this block object, you
 //        can update your progress bar. */
-//        
+//
 //      }
-//      
+//
 //      /* Now get the video */
 //      PHCachingImageManager().requestAVAssetForVideo(asset,
 //        options: options,
 //        resultHandler: {[weak self](asset: AVAsset!,
 //          audioMix: AVAudioMix!,
 //          info: [NSObject : AnyObject]!) in
-//          
+//
 //          /* This result handler is performed on a random thread but
 //          we want to do some UI work so let's switch to the main thread */
-//          
+//
 //          dispatch_async(dispatch_get_main_queue(), {
-//            
+//
 //            /* Did we get the URL to the video? */
 //            if let asset = asset as? AVURLAsset{
 //              let player = AVPlayer(URL: asset.URL)
@@ -202,9 +211,9 @@ class ViewController: UIViewController {
 //            } else {
 //              println("This is not a URL asset. Cannot play")
 //            }
-//            
+//
 //            })
-//          
+//
 //        })
 //      
 //    }
